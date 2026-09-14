@@ -1,0 +1,37 @@
+name: Automação da Calculadora
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verificar-projeto:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Baixar o código do projeto
+        uses: actions/checkout@v4
+
+      - name: Verificar arquivos principais
+        run: |
+          echo "Verificando estrutura da Calculadora Multifuncional..."
+
+          test -f index.html
+          test -f style.css
+          test -f script.js
+
+          echo "Todos os arquivos principais foram encontrados!"
+
+      - name: Finalizar automação
+        run: |
+          echo "===================================="
+          echo "Automação executada com sucesso!"
+          echo "Calculadora Multifuncional"
+          echo "===================================="

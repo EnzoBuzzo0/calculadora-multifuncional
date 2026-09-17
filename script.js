@@ -123,9 +123,3 @@ function limpar() {
     document.getElementById("numero2").value = "";
     document.getElementById("resultado").innerHTML = "Resultado:";
 }
-
-function limpar() {
-    document.getElementById("numero1").value = "";
-    document.getElementById("numero2").value = "";
-    document.getElementById("resultado").innerHTML = "Resultado:";
-}

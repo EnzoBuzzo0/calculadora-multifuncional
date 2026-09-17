@@ -1,54 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Multifuncional</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-    <div class="calculadora">
-
-        <h1>Calculadora Multifuncional</h1>
-
-        <label for="numero1">Número 1 (ou Valor principal)</label>
-        <input type="number" id="numero1" step="any" placeholder="Digite o primeiro número">
-
-        <label for="numero2">Número 2 (se aplicável)</label>
-        <input type="number" id="numero2" step="any" placeholder="Digite o segundo número">
-
-        <div class="botoes">
-            <!-- Operações Básicas -->
-            <button onclick="somar()">Somar</button>
-            <button onclick="subtrair()">Subtrair</button>
-            <button onclick="multiplicar()">Multiplicar</button>
-            <button onclick="dividir()">Dividir</button>
-            <button onclick="porcentagem()">%</button>
-            <button onclick="adicionarVirgula()">,</button>
-
-            <!-- Funções Avançadas -->
-            <button onclick="raizQuadrada()" class="btn-cientifico">√ (Raiz)</button>
-            <button onclick="seno()" class="btn-cientifico">Sen</button>
-            <button onclick="cosseno()" class="btn-cientifico">Cos</button>
-            <button onclick="tangente()" class="btn-cientifico">Tan</button>
-            <button onclick="logaritmo()" class="btn-cientifico">Log (base 10)</button>
-
-            <!-- Botão de Limpar -->
-            <button onclick="limpar()" class="btn-ce">CE</button>
+    <main class="calculadora">
+        <div class="topo">
+            <div>
+                <span class="subtitulo">Calculadora</span>
+                <h1>Multifuncional</h1>
+            </div>
+            <button id="btnCientifica" class="btn-modo" onclick="alternarCientifica()">
+                Calculadora científica
+            </button>
         </div>
 
-        <h2 id="resultado">
-            Resultado:
-        </h2>
+        <section class="visor" aria-label="Visor da calculadora">
+            <div id="expressao" class="expressao"></div>
+            <div id="display" class="display">0</div>
+        </section>
 
-    </div>
+        <section id="cientifica" class="painel-cientifico" hidden>
+            <div class="titulo-painel">Funções científicas</div>
+            <div class="grade-cientifica">
+                <button onclick="aplicarFuncao(raizQuadrada)">√</button>
+                <button onclick="aplicarFuncao(seno)">sen</button>
+                <button onclick="aplicarFuncao(cosseno)">cos</button>
+                <button onclick="aplicarFuncao(tangente)">tan</button>
+                <button onclick="aplicarFuncao(logaritmo)">log</button>
+                <button onclick="aplicarFuncao(logNatural)">ln</button>
+                <button onclick="aplicarFuncao(quadrado)">x²</button>
+                <button onclick="aplicarFuncao(inverso)">1/x</button>
+                <button onclick="aplicarConstante(Math.PI)">π</button>
+                <button onclick="aplicarConstante(Math.E)">e</button>
+            </div>
+        </section>
+
+        <section class="teclado">
+            <button class="funcao" onclick="limpar()">AC</button>
+            <button class="funcao" onclick="alternarSinal()">+/−</button>
+            <button class="funcao" onclick="porcentagem()">%</button>
+            <button class="operador" onclick="escolherOperador('÷')">÷</button>
+
+            <button onclick="digitar('7')">7</button>
+            <button onclick="digitar('8')">8</button>
+            <button onclick="digitar('9')">9</button>
+            <button class="operador" onclick="escolherOperador('×')">×</button>
+
+            <button onclick="digitar('4')">4</button>
+            <button onclick="digitar('5')">5</button>
+            <button onclick="digitar('6')">6</button>
+            <button class="operador" onclick="escolherOperador('−')">−</button>
+
+            <button onclick="digitar('1')">1</button>
+            <button onclick="digitar('2')">2</button>
+            <button onclick="digitar('3')">3</button>
+            <button class="operador" onclick="escolherOperador('+')">+</button>
+
+            <button class="zero" onclick="digitar('0')">0</button>
+            <button onclick="adicionarVirgula()">,</button>
+            <button class="igual" onclick="calcular()">=</button>
+        </section>
+
+        <div id="resultado" class="mensagem" aria-live="polite">Pronto.</div>
+    </main>
 
     <script src="script.js"></script>
-
 </body>
-
 </html>
+

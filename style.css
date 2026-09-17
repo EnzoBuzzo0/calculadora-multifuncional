@@ -1,112 +1,240 @@
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+}
+
+:root {
+    --bg: #000;
+    --card: #171717;
+    --display: #050505;
+    --number: #333333;
+    --function: #a5a5a5;
+    --operator: #ff9f0a;
+    --text: #fff;
+    --muted: #8e8e93;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    padding: 24px;
+    background:
+        radial-gradient(circle at top, #242424 0, #090909 42%, #000 75%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", sans-serif;
 }
 
 .calculadora {
-    background: #ffffff;
-    padding: 30px;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 16px;
-    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+    width: min(100%, 420px);
+    background: rgba(23, 23, 23, .96);
+    border: 1px solid #292929;
+    border-radius: 30px;
+    padding: 22px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+}
+
+.topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.subtitulo {
+    color: var(--muted);
+    font-size: 13px;
 }
 
 h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
     font-size: 22px;
-}
-
-label {
-    display: block;
-    margin-top: 12px;
     font-weight: 600;
-    color: #666;
-    font-size: 14px;
+    letter-spacing: -.5px;
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    margin-top: 6px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-input:focus {
-    border-color: #4a90e2;
-}
-
-.botoes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background-color: #4a90e2;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-    border-radius: 8px;
+.btn-modo {
+    border: 0;
+    border-radius: 14px;
+    padding: 10px 12px;
+    background: #262626;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: .2s ease;
 }
 
-button:hover {
-    background-color: #357abd;
+.btn-modo:hover {
+    background: #353535;
+    transform: translateY(-1px);
 }
 
-button:active {
-    transform: scale(0.98);
+.btn-modo.ativo {
+    background: var(--operator);
 }
 
-/* Estilo para os botões das funções científicas */
-.btn-cientifico {
-    background-color: #6c5ce7;
+.visor {
+    min-height: 130px;
+    padding: 20px 14px 14px;
+    margin-bottom: 12px;
+    border-radius: 20px;
+    background: var(--display);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: right;
+    overflow: hidden;
 }
 
-.btn-cientifico:hover {
-    background-color: #5b4bc4;
+.expressao {
+    min-height: 22px;
+    color: #8e8e93;
+    font-size: 15px;
+    overflow-wrap: anywhere;
 }
 
-/* Botão de limpar */
-.btn-ce {
-    background-color: #e74c3c;
+.display {
+    margin-top: 4px;
+    font-size: clamp(42px, 11vw, 64px);
+    line-height: 1;
+    font-weight: 300;
+    letter-spacing: -2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.display::-webkit-scrollbar {
+    display: none;
+}
+
+.painel-cientifico {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 20px;
+    background: #202020;
+    animation: aparecer .18s ease;
+}
+
+.titulo-painel {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 4px 9px;
+}
+
+.grade-cientifica {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+}
+
+.grade-cientifica button {
+    min-height: 42px;
+    border: 0;
+    border-radius: 12px;
+    background: #3a3a3c;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.grade-cientifica button:hover {
+    background: #505052;
+}
+
+.teclado {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.teclado button {
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    border: 0;
+    border-radius: 50%;
+    background: var(--number);
+    color: var(--text);
+    font-size: 25px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+}
+
+.teclado button:hover {
+    filter: brightness(1.15);
+}
+
+.teclado button:active,
+.grade-cientifica button:active {
+    transform: scale(.94);
+}
+
+.teclado .funcao {
+    background: var(--function);
+    color: #000;
+}
+
+.teclado .operador,
+.teclado .igual {
+    background: var(--operator);
+    color: #fff;
+}
+
+.teclado .operador.selecionado {
+    background: #fff;
+    color: var(--operator);
+}
+
+.teclado .zero {
     grid-column: span 2;
+    aspect-ratio: auto;
+    border-radius: 999px;
+    text-align: left;
+    padding-left: 28px;
 }
 
-.btn-ce:hover {
-    background-color: #c0392b;
-}
-
-#resultado {
-    margin-top: 25px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+.mensagem {
+    min-height: 18px;
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 12px;
     text-align: center;
-    color: #2c3e50;
-    font-size: 18px;
-    word-wrap: break-word;
 }
+
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 420px) {
+    body {
+        padding: 10px;
+    }
+
+    .calculadora {
+        padding: 16px;
+        border-radius: 25px;
+    }
+
+    .topo {
+        align-items: flex-start;
+    }
+
+    .btn-modo {
+        max-width: 150px;
+    }
+
+    .teclado {
+        gap: 8px;
+    }
+
+    .teclado button {
+        font-size: 22px;
+    }
+}
+

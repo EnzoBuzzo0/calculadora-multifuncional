@@ -1,125 +1,286 @@
-function somar() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    let numero2 = Number(document.getElementById("numero2").value);
+let valorAtual = "0";
+let valorAnterior = null;
+let operador = null;
+let esperandoNovoValor = false;
+let ultimaExpressao = "";
 
-    let resultado = numero1 + numero2;
+const display = () => document.getElementById("display");
+const expressao = () => document.getElementById("expressao");
+const mensagem = () => document.getElementById("resultado");
 
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
+function atualizarDisplay() {
+    display().textContent = formatarNumero(valorAtual);
 }
 
-function subtrair() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    let numero2 = Number(document.getElementById("numero2").value);
+function formatarNumero(valor) {
+    if (valor === "Erro") return valor;
 
-    let resultado = numero1 - numero2;
+    const numero = Number(valor);
+    if (!Number.isFinite(numero)) return "Erro";
 
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
-}
-
-function multiplicar() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    let numero2 = Number(document.getElementById("numero2").value);
-
-    let resultado = numero1 * numero2;
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
-}
-
-function dividir() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    let numero2 = Number(document.getElementById("numero2").value);
-
-    if (numero2 === 0) {
-        document.getElementById("resultado").innerHTML = "Não é possível dividir por zero.";
-        return;
+    const abs = Math.abs(numero);
+    if (abs !== 0 && (abs >= 1e12 || abs < 1e-9)) {
+        return numero.toExponential(8).replace(".", ",");
     }
 
-    let resultado = numero1 / numero2;
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
+    return Number(numero.toPrecision(12)).toString().replace(".", ",");
 }
 
-function porcentagem() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    let numero2 = Number(document.getElementById("numero2").value);
-
-    let resultado = (numero1 * numero2) / 100;
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado + "%";
+function numeroParaCalculo() {
+    return Number(valorAtual);
 }
 
-// Novos métodos adicionados:
+function mostrarMensagem(texto = "Pronto.") {
+    mensagem().textContent = texto;
+}
 
-function raizQuadrada() {
-    let numero1 = Number(document.getElementById("numero1").value);
+function digitar(digito) {
+    if (valorAtual === "Erro") limpar();
 
-    if (numero1 < 0) {
-        document.getElementById("resultado").innerHTML = "Não existe raiz de número negativo no conjunto dos reais.";
-        return;
+    if (esperandoNovoValor) {
+        valorAtual = digito;
+        esperandoNovoValor = false;
+    } else if (valorAtual === "0") {
+        valorAtual = digito;
+    } else if (valorAtual.replace("-", "").replace(".", "").length < 14) {
+        valorAtual += digito;
     }
 
-    let resultado = Math.sqrt(numero1);
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
-}
-
-function seno() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    // Converte de graus para radianos
-    let radianos = (numero1 * Math.PI) / 180;
-    let resultado = Math.sin(radianos);
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado.toFixed(6);
-}
-
-function cosseno() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    // Converte de graus para radianos
-    let radianos = (numero1 * Math.PI) / 180;
-    let resultado = Math.cos(radianos);
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado.toFixed(6);
-}
-
-function tangente() {
-    let numero1 = Number(document.getElementById("numero1").value);
-    
-    if ((numero1 - 90) % 180 === 0) {
-        document.getElementById("resultado").innerHTML = "Tangente indefinida para esse ângulo.";
-        return;
-    }
-
-    // Converte de graus para radianos
-    let radianos = (numero1 * Math.PI) / 180;
-    let resultado = Math.tan(radianos);
-
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado.toFixed(6);
-}
-
-function logaritmo() {
-    let numero1 = Number(document.getElementById("numero1").value);
-
-    if (numero1 <= 0) {
-        document.getElementById("resultado").innerHTML = "Logaritmo indefinido para valores <= 0.";
-        return;
-    }
-
-    let resultado = Math.log10(numero1);
-    document.getElementById("resultado").innerHTML = "Resultado: " + resultado;
+    atualizarDisplay();
 }
 
 function adicionarVirgula() {
-    let input1 = document.getElementById("numero1");
-    let input2 = document.getElementById("numero2");
-
-    if (document.activeElement === input1 && !input1.value.includes(".")) {
-        input1.value += ".";
-    } else if (document.activeElement === input2 && !input2.value.includes(".")) {
-        input2.value += ".";
+    if (esperandoNovoValor) {
+        valorAtual = "0.";
+        esperandoNovoValor = false;
+    } else if (!valorAtual.includes(".")) {
+        valorAtual += ".";
     }
+    atualizarDisplay();
+}
+
+function alternarSinal() {
+    if (valorAtual === "0" || valorAtual === "Erro") return;
+    valorAtual = valorAtual.startsWith("-")
+        ? valorAtual.slice(1)
+        : "-" + valorAtual;
+    atualizarDisplay();
 }
 
 function limpar() {
-    document.getElementById("numero1").value = "";
-    document.getElementById("numero2").value = "";
-    document.getElementById("resultado").innerHTML = "Resultado:";
+    valorAtual = "0";
+    valorAnterior = null;
+    operador = null;
+    esperandoNovoValor = false;
+    ultimaExpressao = "";
+    expressao().textContent = "";
+    atualizarDisplay();
+    mostrarMensagem("Pronto.");
+    limparOperadorSelecionado();
 }
+
+function escolherOperador(novoOperador) {
+    if (valorAtual === "Erro") return;
+
+    if (operador && !esperandoNovoValor) {
+        calcular(false);
+    }
+
+    valorAnterior = numeroParaCalculo();
+    operador = novoOperador;
+    esperandoNovoValor = true;
+
+    expressao().textContent = `${formatarNumero(valorAnterior)} ${novoOperador}`;
+    mostrarMensagem("Digite o próximo número.");
+    marcarOperador(novoOperador);
+}
+
+function calcular(mostrarResultado = true) {
+    if (operador === null || valorAnterior === null) return;
+
+    const atual = numeroParaCalculo();
+    let resultado;
+
+    switch (operador) {
+        case "+": resultado = valorAnterior + atual; break;
+        case "−": resultado = valorAnterior - atual; break;
+        case "×": resultado = valorAnterior * atual; break;
+        case "÷":
+            if (atual === 0) {
+                valorAtual = "Erro";
+                expressao().textContent = "Divisão por zero";
+                mostrarMensagem("Não é possível dividir por zero.");
+                operador = null;
+                valorAnterior = null;
+                esperandoNovoValor = true;
+                atualizarDisplay();
+                return;
+            }
+            resultado = valorAnterior / atual;
+            break;
+    }
+
+    if (!Number.isFinite(resultado)) {
+        valorAtual = "Erro";
+        mostrarMensagem("Resultado inválido.");
+    } else {
+        valorAtual = String(resultado);
+        if (mostrarResultado) {
+            expressao().textContent = `${formatarNumero(valorAnterior)} ${operador} ${formatarNumero(atual)} =`;
+            mostrarMensagem("Resultado calculado.");
+        }
+    }
+
+    valorAnterior = null;
+    operador = null;
+    esperandoNovoValor = true;
+    atualizarDisplay();
+    limparOperadorSelecionado();
+}
+
+function porcentagem() {
+    const numero = numeroParaCalculo();
+
+    if (valorAnterior !== null && operador) {
+        valorAtual = String((valorAnterior * numero) / 100);
+    } else {
+        valorAtual = String(numero / 100);
+    }
+
+    atualizarDisplay();
+    mostrarMensagem("Porcentagem aplicada.");
+}
+
+function aplicarFuncao(funcao) {
+    if (valorAtual === "Erro") return;
+
+    const entrada = numeroParaCalculo();
+    const resultado = funcao(entrada);
+
+    if (resultado === null || !Number.isFinite(resultado)) {
+        valorAtual = "Erro";
+        mostrarMensagem("Operação inválida para este valor.");
+    } else {
+        valorAtual = String(resultado);
+        mostrarMensagem("Função científica aplicada.");
+    }
+
+    esperandoNovoValor = true;
+    atualizarDisplay();
+}
+
+function raizQuadrada(numero = numeroParaCalculo()) {
+    if (numero < 0) return null;
+    return Math.sqrt(numero);
+}
+
+function seno(numero = numeroParaCalculo()) {
+    return Math.sin((numero * Math.PI) / 180);
+}
+
+function cosseno(numero = numeroParaCalculo()) {
+    return Math.cos((numero * Math.PI) / 180);
+}
+
+function tangente(numero = numeroParaCalculo()) {
+    const radianos = (numero * Math.PI) / 180;
+    const cossenoValor = Math.cos(radianos);
+
+    if (Math.abs(cossenoValor) < 1e-12) return null;
+    return Math.tan(radianos);
+}
+
+function logaritmo(numero = numeroParaCalculo()) {
+    if (numero <= 0) return null;
+    return Math.log10(numero);
+}
+
+function logNatural(numero = numeroParaCalculo()) {
+    if (numero <= 0) return null;
+    return Math.log(numero);
+}
+
+function quadrado(numero = numeroParaCalculo()) {
+    return numero ** 2;
+}
+
+function inverso(numero = numeroParaCalculo()) {
+    if (numero === 0) return null;
+    return 1 / numero;
+}
+
+function aplicarConstante(constante) {
+    valorAtual = String(constante);
+    esperandoNovoValor = true;
+    atualizarDisplay();
+    mostrarMensagem("Constante inserida.");
+}
+
+function alternarCientifica() {
+    const painel = document.getElementById("cientifica");
+    const botao = document.getElementById("btnCientifica");
+    const aberto = painel.hidden;
+
+    painel.hidden = !aberto;
+    botao.classList.toggle("ativo", aberto);
+    botao.textContent = aberto
+        ? "Ocultar científica"
+        : "Calculadora científica";
+}
+
+function marcarOperador(op) {
+    limparOperadorSelecionado();
+    const botoes = document.querySelectorAll(".operador");
+    botoes.forEach(botao => {
+        if (botao.textContent === op) botao.classList.add("selecionado");
+    });
+}
+
+function limparOperadorSelecionado() {
+    document.querySelectorAll(".operador").forEach(botao => {
+        botao.classList.remove("selecionado");
+    });
+}
+
+// Mantém compatibilidade com os nomes das funções da versão original.
+function somar() {
+    escolherOperador("+");
+}
+
+function subtrair() {
+    escolherOperador("−");
+}
+
+function multiplicar() {
+    escolherOperador("×");
+}
+
+function dividir() {
+    escolherOperador("÷");
+}
+
+// Teclado físico
+document.addEventListener("keydown", (evento) => {
+    const tecla = evento.key;
+
+    if (/^[0-9]$/.test(tecla)) digitar(tecla);
+    else if (tecla === "." || tecla === ",") adicionarVirgula();
+    else if (tecla === "+") escolherOperador("+");
+    else if (tecla === "-") escolherOperador("−");
+    else if (tecla === "*") escolherOperador("×");
+    else if (tecla === "/") {
+        evento.preventDefault();
+        escolherOperador("÷");
+    }
+    else if (tecla === "%") porcentagem();
+    else if (tecla === "Enter" || tecla === "=") calcular();
+    else if (tecla === "Escape") limpar();
+    else if (tecla === "Backspace") {
+        if (!esperandoNovoValor && valorAtual !== "0" && valorAtual !== "Erro") {
+            valorAtual = valorAtual.length > 1 ? valorAtual.slice(0, -1) : "0";
+            atualizarDisplay();
+        }
+    }
+});
+
+atualizarDisplay();
